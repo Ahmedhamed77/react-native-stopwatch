@@ -9,14 +9,16 @@ import Animated, {
   StyleProps,
   withTiming,
 } from "react-native-reanimated";
+import { useClock } from "./useClock";
 
 const animationDistance = 150;
 const animationDuration = 300;
 
 export default function App() {
-  const [counter, setCounter] = useState(0);
 
-  const onIncrement = () => setCounter((prev) => prev + 1);
+
+  const {counter:timer,start,pause,isRunning} = useClock(0);
+
 
   const entering = (values: EntryAnimationsValues): LayoutAnimation => {
     "worklet";
@@ -50,22 +52,24 @@ export default function App() {
       initialValues,
     };
   };
+
+  console.log(isRunning,'===isRunning')
   return (
     <View style={styles.container}>
-      <View style={{ paddingBottom: 32, overflow: "hidden" }}>
+      <View style={{  overflow: "hidden",backgroundColor:'#ffffff',borderRadius:12,width:'100%',alignItems:'center' }}>
         <Animated.Text
-          key={counter}
+          key={timer}
           entering={entering}
           exiting={existing}
           style={styles.counter}
         >
-          {counter}
+          {timer}
         </Animated.Text>
       </View>
 
       <View style={styles.buttonContainer}>
-        <Pressable onPressIn={onIncrement} style={styles.buttonStyle}>
-          <Text style={styles.buttonTitle}>Increment</Text>
+        <Pressable onPressIn={!isRunning ? start: pause} style={styles.buttonStyle}>
+          <Text style={styles.buttonTitle}>{!isRunning ? 'Start' : 'Pause'}</Text>
         </Pressable>
         <StatusBar style="auto" />
       </View>
@@ -76,7 +80,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#EAEAF3",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 16,
@@ -91,7 +95,6 @@ const styles = StyleSheet.create({
 
   buttonContainer: {
     position: "absolute",
-    backgroundColor: "#ffffff",
     bottom: 100,
     left: 64,
     right: 64,
